@@ -46,40 +46,7 @@ class CustomFooter extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Made with love by:',
-                    style: TextStyle(
-                      color: theme.textPrimary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      _FooterLink(
-                        name: 'Jules Gimenez',
-                        url: 'https://github.com/ladajules',
-                      ),
-                      SizedBox(width: 10),
-                      _FooterLink(
-                        name: 'Gaea Mutia',
-                        url: 'https://github.com/Gaeano',
-                      ),
-                      SizedBox(width: 10),
-                      _FooterLink(
-                        name: 'Althea Telmo',
-                        url: 'https://github.com/xysonie',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  Divider(color: theme.glassBorder, thickness: 1),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   Text(
                     '\u00a9 ${DateTime.now().year} MovieIt. All rights reserved.',
                     style: TextStyle(color: theme.textMuted, fontSize: 11),

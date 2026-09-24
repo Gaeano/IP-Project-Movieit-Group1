@@ -51,52 +51,10 @@ class CustomNavBar extends StatelessWidget implements PreferredSizeWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  HoverActionIcon(
-                    icon: Icons.notifications_none_rounded,
-                    onTap: () {
-                      showGeneralDialog(
-                        context: context,
-                        barrierColor: Colors.transparent,
-                        barrierDismissible: true, 
-                        barrierLabel: "Dismiss Notifications",
-                        transitionDuration: const Duration(milliseconds: 200),
-                        pageBuilder: (context, animation, secondaryAnimation) {
-                          return Align(
-                            alignment: Alignment.topRight,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 70, right: 24), 
-                              // 2. Call the new widget name here
-                              child: const NotificationWidget(),
-                        ),
-                      );
-                    },
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 6,),
+                  Icon(Icons.notifications_none_rounded),
+                  const SizedBox(width: 12),
                   
-                  HoverActionIcon(
-                    icon: Icons.settings_rounded,
-                    onTap: () {
-                      showGeneralDialog(
-                        context: context,
-                        barrierColor: Colors.transparent,
-                        barrierDismissible: true, 
-                        barrierLabel: "Dismiss Settiings",
-                        transitionDuration: const Duration(milliseconds: 200),
-                        pageBuilder: (context, animation, secondaryAnimation) {
-                          return Align(
-                            alignment: Alignment.topRight,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 70, right: 24), 
-                              // 2. Call the new widget name here
-                              child: const SettingsWidget(),
-                        ),
-                      );
-                    },
-                      );
-                    },
-                  ),
+                  Icon(Icons.settings_rounded),
                 ],
               ),
             )

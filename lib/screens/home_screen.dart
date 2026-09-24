@@ -1,30 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:movieit/providers/movie_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:movieit/widgets/layout/custom_footer.dart';
-import 'package:provider/provider.dart';
-import '../widgets/hero_slider.dart';
-import '../widgets/horizontal_movie_list.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-
-  @override
-  void initState(){
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_){
-      Provider.of<MovieProvider>(context, listen: false).loadTrendingAndDiscoverAndTop4();
-    });
-  }
-
-  
-  
- 
   @override
   Widget build(BuildContext context) {  
     return Scaffold(
@@ -33,49 +13,71 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _buildBackground(),
 
-          Consumer<MovieProvider>(
-            builder: (context, movieProvider, child){
-              if (movieProvider.isLoading){
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if(movieProvider.errorMessage.isNotEmpty){
-                return Center(child: Text(movieProvider.errorMessage, style: const TextStyle(color: Colors.red, fontSize: 18)));
-              }
-
-              return SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 140),
-                          
-                          //  hero Slider
-                          HeroSlider(movies: movieProvider.top4MoviesList),
-                          
-                          const SizedBox(height: 60),
-                          
-                          /// HORIZONTAL MOVIE LISTTT
-                          //  Trending NOW (GLOBAL)
-                          HorizontalMovieList(movies: movieProvider.trendingMoviesList, sectionTitle: "Trending Now",),
-                          const SizedBox(height: 15),
-
-                          // Popular in PH
-                          HorizontalMovieList(movies: movieProvider.popularPHMoviesList, sectionTitle: "Popular in Philippines",),
-                          const SizedBox(height: 15),
-
-                          // Upcoming MOvies
-                          HorizontalMovieList(movies: movieProvider.upcomingMoviesList, sectionTitle: "Upcoming Movies",),
-                          
-                          const SizedBox(height: 60),
-
-                          CustomFooter(),
-                        ],
-                      ),
-                    );
-            }
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 140),
+                
+                GestureDetector(
+                  onTap: () {
+                    context.push('/movie/123'); 
+                  },
+                  child: Container(
+                    height: 550,
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFA970FF), width: 2),
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 60),
+                
+                _buildStaticHorizontalList("Trending Now"),
+                const SizedBox(height: 15),
+                _buildStaticHorizontalList("Popular in Philippines"),
+                const SizedBox(height: 15),
+                _buildStaticHorizontalList("Upcoming Movies"),
+                
+                const SizedBox(height: 60),
+                const CustomFooter(),
+              ],
+            ),
           )
         ],
       ),
+    );
+  }
 
+  Widget _buildStaticHorizontalList(String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          height: 220,
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ],
     );
   }
 

@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:movieit/models/user_preferences.dart';
-import 'package:movieit/models/watchlist_item.dart';
-import 'package:movieit/widgets/import_export_modal.dart';
-import 'package:movieit/widgets/schedule_movie_modal.dart';
-import 'package:movieit/widgets/universal_banner.dart';
 import '../../theme/app_styles.dart';
 import '../../theme/app_colors.dart';
 
@@ -18,8 +12,6 @@ import '../widgets/roulette_card.dart';
 import '../widgets/stats_card.dart';
 import '../widgets/streak_card.dart';
 import '../widgets/watchlist_section.dart';
-
-import '../services/local_db_service.dart';
 
 class PlannerScreen extends StatelessWidget {
   const PlannerScreen({super.key});
@@ -66,46 +58,48 @@ class _TopBar extends StatelessWidget {
       child: Row(
         children: [
           Text('My Planner', style: AppStyles.value(size: 26)),
-
-          // TO REMVOE SOOONESTTT
-          const SizedBox(width: 16),
-          IconButton(
-            icon: const Icon(Icons.bug_report, color: Colors.redAccent),
-            onPressed: () async {
-              await LocalDbService().injectTestData();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Test Data Injected!')),
-                );
-              }
-            },
-          ),
-          // ======================================================================
-
           const Spacer(),
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-            onTap: () {
-              showDialog(
-                context: context,
-                barrierColor: Colors.black.withOpacity(0.7),
-                builder: (context) => const ImportExportModal(),
-              );
-            },
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: AppColors.plannerSurface,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.cardBorder),
-              ),
-              child: const Icon(Icons.import_export_rounded, color: AppColors.textSecondary, size: 18),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.plannerSurface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.cardBorder),
             ),
-          ),
+            child: const Icon(Icons.import_export_rounded, color: AppColors.textSecondary, size: 18),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ScheduleFab extends StatelessWidget {
+  const ScheduleFab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.plannerCard,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: AppColors.softPeriwinkle.withOpacity(0.5)),
+          boxShadow: [
+            BoxShadow(color: AppColors.softPeriwinkle.withOpacity(0.15), blurRadius: 20, spreadRadius: 2),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.calendar_month_outlined, color: AppColors.softPeriwinkle, size: 18),
+            const SizedBox(width: 8),
+            Text('Schedule a movie night', style: AppStyles.body(size: 13, color: AppColors.softPeriwinkle)),
+          ],
+        ),
       ),
     );
   }
@@ -127,39 +121,21 @@ class _DesktopLayout extends StatelessWidget {
                 const Expanded(
                   flex: 2,
                   child: Column(
-                    children: [
-                      StreakCard(),
-                      SizedBox(height: 12),
-                      MonthlyGoalCard(),
-                      SizedBox(height: 12),
-                      CalendarCard(),
-                    ],
+                    children: [StreakCard(), SizedBox(height: 12), MonthlyGoalCard(), SizedBox(height: 12), CalendarCard()],
                   ),
                 ),
                 const SizedBox(width: 16),
                 const Expanded(
                   flex: 5,
                   child: Column(
-                    children: [
-                      StatsCard(),
-                      SizedBox(height: 16),
-                      PendingReviewCard(),
-                      SizedBox(height: 16),
-                      WatchlistSection(),
-                    ],
+                    children: [StatsCard(), SizedBox(height: 16), PendingReviewCard(), SizedBox(height: 16), WatchlistSection()],
                   ),
                 ),
                 const SizedBox(width: 16),
                 const Expanded(
                   flex: 2,
                   child: Column(
-                    children: [
-                      RouletteCard(),
-                      SizedBox(height: 12),
-                      PlatformsCard(),
-                      SizedBox(height: 12),
-                      RecentActivityCard(),
-                    ],
+                    children: [RouletteCard(), SizedBox(height: 12), PlatformsCard(), SizedBox(height: 12), RecentActivityCard()],
                   ),
                 ),
               ],
@@ -184,83 +160,16 @@ class _MobileLayout extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(40, 0, 40, 60),
             child: Column(
               children: const [
-                Row(children: [
-                  Expanded(child: StreakCard()),
-                  SizedBox(width: 12),
-                  Expanded(child: MonthlyGoalCard()),
-                ]),
-                SizedBox(height: 12),
-                StatsCard(),
-                SizedBox(height: 12),
-                CalendarCard(),
-                SizedBox(height: 12),
-                PendingReviewCard(),
-                SizedBox(height: 12),
-                RouletteCard(),
-                SizedBox(height: 12),
-                WatchlistSection(),
-                SizedBox(height: 12),
-                PlatformsCard(),
-                SizedBox(height: 12),
-                RecentActivityCard(),
+                Row(children: [Expanded(child: StreakCard()), SizedBox(width: 12), Expanded(child: MonthlyGoalCard())]),
+                SizedBox(height: 12), StatsCard(), SizedBox(height: 12), CalendarCard(), SizedBox(height: 12),
+                PendingReviewCard(), SizedBox(height: 12), RouletteCard(), SizedBox(height: 12), WatchlistSection(),
+                SizedBox(height: 12), PlatformsCard(), SizedBox(height: 12), RecentActivityCard(),
               ],
             ),
           ),
           const CustomFooter(),
         ],
       ),
-    );
-  }
-}
-
-class ScheduleFab extends StatelessWidget {
-  const ScheduleFab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-      onTap: () {
-        final movies = Hive.box<WatchlistItem>('watchlist').values.toList();
-        if (movies.isEmpty) {
-          final prefs = Hive.box<UserPreferences>('user_preferences').get('current_prefs');
-          if (prefs != null && prefs.notificationsEnabled) {
-            UniversalBanner.show(
-              context: context,
-              title: 'Watchlist is Empty',
-              subTitle: 'Add movies to your watchlist before scheduling a movie night.',
-              fallbackIcon: Icons.movie_creation_outlined,
-            );
-          }
-          return;
-        }
-        showDialog(
-          context: context,
-          barrierColor: Colors.black.withValues(alpha: 0.7),
-          builder: (_) => ScheduleFromWatchlistModal(movies: movies),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-        decoration: BoxDecoration(
-          color: AppColors.plannerCard,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: AppColors.softPeriwinkle.withOpacity(0.5)),
-          boxShadow: [
-            BoxShadow(color: AppColors.softPeriwinkle.withOpacity(0.15), blurRadius: 20, spreadRadius: 2),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.calendar_month_outlined, color: AppColors.softPeriwinkle, size: 18),
-            const SizedBox(width: 8),
-            Text('Schedule a movie night', style: AppStyles.body(size: 13, color: AppColors.softPeriwinkle)),
-          ],
-        ),
-      ),
-    ),
     );
   }
 }
