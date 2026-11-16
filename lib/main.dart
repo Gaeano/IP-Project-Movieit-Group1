@@ -12,6 +12,7 @@ import 'package:movieit/screens/home_screen.dart';
 import 'package:movieit/screens/search_screen.dart';
 import 'package:movieit/screens/planner_screen.dart';
 import 'package:movieit/screens/movie_detail_screen.dart';
+import 'package:movieit/screens/authentication_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movieit/utils/main_app_shell.dart';
 import 'package:provider/provider.dart';
@@ -68,6 +69,10 @@ final GoRouter _router = GoRouter(
       ],
     ),
 
+    GoRoute(
+      path: '/auth',
+      builder: (context, state) => const AuthenticationScreen(),
+    ),
     GoRoute(
       path: '/movie/:id',
       builder: (context, state) {

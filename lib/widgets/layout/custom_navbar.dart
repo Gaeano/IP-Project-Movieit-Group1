@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; //from the signup button feat
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movieit/widgets/hover_action_icon.dart';
 import 'package:movieit/widgets/notification_widget.dart';
@@ -51,6 +52,30 @@ class CustomNavBar extends StatelessWidget implements PreferredSizeWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  InkWell(// start line of the signup button
+                    onTap: () => context.go('/auth'),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFAC66FF).withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Text(
+                        'Sign up',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10), //this is temporary sign up button
                   HoverActionIcon(
                     icon: Icons.notifications_none_rounded,
                     onTap: () {
