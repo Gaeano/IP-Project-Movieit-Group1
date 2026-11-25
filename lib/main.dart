@@ -17,8 +17,12 @@ import 'package:go_router/go_router.dart';
 import 'package:movieit/utils/main_app_shell.dart';
 import 'package:provider/provider.dart';
 
+import 'package:movieit/config/env.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Env.assertConfigured();
+  
   await Hive.initFlutter();
 
   Hive.registerAdapter(ScheduledEventAdapter());

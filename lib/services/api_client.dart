@@ -10,8 +10,8 @@ import 'package:movieit/models/sources_model.dart';
 
 class ApiClient {
   
-  static const String _baseUrl = 'http://localhost:3000/api/movies';
-  static const String _baseUrlWatchmode = 'http://localhost:3000/api/watchmode';
+  static const String _baseUrl = 'http://localhost:20210/api/movies';
+  static const String _baseUrlWatchmode = 'http://localhost:20210/api/watchmode';
 
 
     var logger = Logger ();
@@ -23,7 +23,7 @@ class ApiClient {
               List<dynamic> data = jsonDecode(response.body);
               return data.map((json) => Movie.fromJson(json)).toList();
             } else {
-            throw Exception('Failed to load trending movies');
+            throw Exception('Failed to load trending movies ${response.statusCode}: ${response.body}');
             }
         } catch (e){
             logger.e('ApiClient error (Trending), $e');
