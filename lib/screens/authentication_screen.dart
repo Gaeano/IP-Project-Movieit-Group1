@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:movieit/providers/auth_provider.dart';
 import 'package:movieit/widgets/login_form.dart';
 import 'package:movieit/widgets/signup_form.dart';
 
@@ -15,6 +17,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
   bool _showLoginForm = true;
 
   void _toggleForm() {
+    context.read<AuthProvider>().clearError();
     setState(() {
       _showLoginForm = !_showLoginForm;
     });
@@ -40,6 +43,25 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
         ),
         child: Stack(
           children: [
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 96, 20, 32),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 260),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  child: _showLoginForm
+                      ? LoginForm(
+                          key: const ValueKey('login'),
+                          onToggle: _toggleForm,
+                        )
+                      : SignupForm(
+                          key: const ValueKey('signup'),
+                          onToggle: _toggleForm,
+                        ),
+                ),
+              ),
+            ),
             Positioned(
               top: 38,
               left: 24,
@@ -66,25 +88,6 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                       ),
                     ],
                   ),
-                ),
-              ),
-            ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 260),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  child: _showLoginForm
-                      ? LoginForm(
-                          key: const ValueKey('login'),
-                          onToggle: _toggleForm,
-                        )
-                      : SignupForm(
-                          key: const ValueKey('signup'),
-                          onToggle: _toggleForm,
-                        ),
                 ),
               ),
             ),
