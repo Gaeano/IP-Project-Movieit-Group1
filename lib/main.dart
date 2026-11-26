@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:movieit/models/scheduled_event.dart';
@@ -17,11 +18,21 @@ import 'package:go_router/go_router.dart';
 import 'package:movieit/utils/main_app_shell.dart';
 import 'package:provider/provider.dart';
 
-import 'package:movieit/config/env.dart';
+import 'package:movieit/providers/auth_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+late final GoRouter _router;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Env.assertConfigured();
+
+  await dotenv.load(fileName: ".env");
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    publishableKey: dotenv.env['SUPABASE_ANON_KEY']!,
+  );
+
+  final authProvider = AuthProvider();
+  _router = createRouter(authProvider);
   
   await Hive.initFlutter();
 
@@ -35,57 +46,83 @@ void main() async {
   await Hive.openBox<UserStats>('user_stats');
   await Hive.openBox<WatchlistItem>('watchlist');
 
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => MovieProvider(),
+ runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider(create: (_) => MovieProvider()),
+      ],
       child: const MyApp(),
     ),
   );
 }
 
-final GoRouter _router = GoRouter(
-  initialLocation: '/',
-  routes: [
-    ShellRoute(
-      builder: (context, state, child) {
-        String activeCategory = 'Home';
-        if (state.fullPath == '/search') activeCategory = 'Search';
-        if (state.fullPath == '/planner') activeCategory = 'Planner';
+GoRouter createRouter(AuthProvider authProvider) {
+  const protectedRoutes = ['/planner', '/watchlist'];
+  const authRoute = '/auth';
 
-        return MainAppShell(
-          child: child,
-          activeCategory: activeCategory
-        );
-      },
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const HomeScreen(),
-        ),
-        GoRoute(
-          path: '/search',
-          builder: (context, state) => const SearchScreen(),
-        ),
-        GoRoute(
-          path: '/planner',
-          builder: (context, state) => const PlannerScreen(),
-        ),
-      ],
-    ),
+  return GoRouter(
+    initialLocation: '/',
+    refreshListenable: authProvider,
+    redirect: (context, state) {
+      final loggedIn = authProvider.isAuthenticated;
+      final path = state.matchedLocation;
 
-    GoRoute(
-      path: '/auth',
-      builder: (context, state) => const AuthenticationScreen(),
-    ),
-    GoRoute(
-      path: '/movie/:id',
-      builder: (context, state) {
-        final movieId = state.pathParameters['id']!;
-        return MovieDetailScreen(movieId: movieId);
-      },
-    ),
-  ],
-);
+      if (!loggedIn && protectedRoutes.any((r) => path.startsWith(r))) {
+        return authRoute;
+      }
+      if (loggedIn && path == authRoute) {
+        return '/planner';
+      }
+      return null;
+    },
+    routes: [
+      ShellRoute(
+        builder: (context, state, child) {
+          final path = state.matchedLocation;
+          String activeCategory = 'Home';
+
+          if (path.startsWith('/search')) {
+            activeCategory = 'Search';
+          } else if (path.startsWith('/planner')) {
+            activeCategory = 'Planner';
+          } else if (path.startsWith('/movie')) {
+            activeCategory = '';
+          }
+
+          return MainAppShell(
+            activeCategory: activeCategory,
+            child: child,
+          );
+        },
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/search',
+            builder: (context, state) => const SearchScreen(),
+          ),
+          GoRoute(
+            path: '/planner',
+            builder: (context, state) => const PlannerScreen(),
+          ),
+          GoRoute(
+            path: '/movie/:id',
+            builder: (context, state) => MovieDetailScreen(
+              movieId: state.pathParameters['id']!,
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: authRoute,
+        builder: (context, state) => const AuthenticationScreen(),
+      ),
+    ],
+  );
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
