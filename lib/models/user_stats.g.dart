@@ -21,8 +21,8 @@ class UserStatsAdapter extends TypeAdapter<UserStats> {
       totalRuntimeMinutes: fields[1] as int,
       totalRatingSum: fields[2] as double,
       totalMoviesRated: fields[3] as int,
-      genreCounts: (fields[4] as Map?)?.cast<String, int>(),
-      platformCounts: (fields[5] as Map?)?.cast<String, int>(),
+      genreCounts: (fields[4] as Map?)?.cast<String, int>() ?? const <String, int>{},
+      platformCounts: (fields[5] as Map?)?.cast<String, int>() ?? const <String, int>{},
       streakPersonalBest: fields[6] as int,
     );
   }

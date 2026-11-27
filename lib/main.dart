@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:movieit/models/scheduled_event.dart';
+
 import 'package:movieit/models/user_preferences.dart';
 import 'package:movieit/models/user_stats.dart';
 import 'package:movieit/models/watchlist_item.dart';
 
 import 'package:movieit/providers/movie_provider.dart';
+import 'package:movieit/providers/planner_provider.dart';
 import 'package:movieit/theme/movieit_theme.dart';
 import 'package:movieit/screens/home_screen.dart';
 import 'package:movieit/screens/search_screen.dart';
@@ -17,6 +18,7 @@ import 'package:movieit/screens/authentication_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movieit/utils/main_app_shell.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 import 'package:movieit/providers/auth_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -31,26 +33,26 @@ void main() async {
     publishableKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  final authProvider = AuthProvider();
-  _router = createRouter(authProvider);
-  
   await Hive.initFlutter();
-
   Hive.registerAdapter(ScheduledEventAdapter());
   Hive.registerAdapter(UserPreferencesAdapter());
   Hive.registerAdapter(UserStatsAdapter());
   Hive.registerAdapter(WatchlistItemAdapter());
-
   await Hive.openBox<ScheduledEvent>('scheduled_event');
   await Hive.openBox<UserPreferences>('user_preferences');
   await Hive.openBox<UserStats>('user_stats');
   await Hive.openBox<WatchlistItem>('watchlist');
+
+  final authProvider = AuthProvider();
+  final plannerProvider = PlannerProvider();
+  _router = createRouter(authProvider);
 
  runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider(create: (_) => MovieProvider()),
+        ChangeNotifierProvider.value(value: plannerProvider),
       ],
       child: const MyApp(),
     ),
@@ -124,8 +126,37 @@ GoRouter createRouter(AuthProvider authProvider) {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  StreamSubscription<AuthState>? _authSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    final client = Supabase.instance.client;
+    _authSubscription = client.auth.onAuthStateChange.listen((authState) {
+      final planner = context.read<PlannerProvider>();
+      if (authState.session != null) {
+        planner.loadAll();
+      } else {
+        planner.clear();
+      }
+    });
+
+    // onAuthStateChange emits initialSession when Supabase restores a browser session.
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

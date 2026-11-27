@@ -19,8 +19,10 @@ class Sources{
     }
 
     if (rawLogo != null) {
-      final encodedUrl = Uri.encodeComponent(rawLogo);
-      rawLogo = 'http://localhost:3000/api/watchmode/image-proxy?url=$encodedUrl';
+      final uri = Uri.tryParse(rawLogo);
+      if (uri == null || !uri.hasScheme) {
+        rawLogo = null;
+      }
     }
 
 
