@@ -1,4 +1,5 @@
 .env
+app.env
 # Miscellaneous
 *.class
 *.log
