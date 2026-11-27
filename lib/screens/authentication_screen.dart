@@ -73,7 +73,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Image.asset(
-                        'icons/popcorn_icon.png',
+                        'assets/icons/popcorn_icon.png',
                         color: Colors.white,
                         width: 30,
                         height: 30,
