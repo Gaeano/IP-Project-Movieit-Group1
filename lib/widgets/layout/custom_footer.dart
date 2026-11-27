@@ -31,7 +31,7 @@ class CustomFooter extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Image.asset(
-                        'icons/popcorn_icon.png',
+                        'assets/icons/popcorn_icon.png',
                         color: theme.textPrimary,
                         width: 25,
                         height: 25,
