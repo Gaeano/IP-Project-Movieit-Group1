@@ -18,7 +18,7 @@ class AuthService {
       email: email.trim(),
       password: password,
       data: {'full_name': fullName.trim()},
-    );
+    );  
   }
 
   Future<AuthResponse> signIn({
@@ -34,7 +34,7 @@ class AuthService {
   Future<bool> signInWithGoogle() async {
     return await _client.auth.signInWithOAuth(
       OAuthProvider.google,
-      redirectTo: kIsWeb ? null : 'io.supabase.movieit://login-callback/',
+      redirectTo: kIsWeb ? Uri.base.origin : 'io.supabase.movieit://login-callback/',
     );
   }
 

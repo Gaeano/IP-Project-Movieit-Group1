@@ -2,13 +2,17 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart'; //from the signup button feat
 import 'package:google_fonts/google_fonts.dart';
+import 'package:movieit/providers/auth_provider.dart';
 import 'package:movieit/widgets/hover_action_icon.dart';
 import 'package:movieit/widgets/notification_widget.dart';
 import 'package:movieit/widgets/settings_widget.dart';
+import 'package:provider/provider.dart';
 
 class CustomNavBar extends StatelessWidget implements PreferredSizeWidget {
   final String activeCategory;
   final Function(String) onTap;
+
+  
 
   const CustomNavBar({
     super.key,
@@ -18,6 +22,9 @@ class CustomNavBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();  
+    final isLoggedIn = auth.isAuthenticated;
+    
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
@@ -53,7 +60,17 @@ class CustomNavBar extends StatelessWidget implements PreferredSizeWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   InkWell(// start line of the signup button
-                    onTap: () => context.go('/auth'),
+                    onTap: auth.isLoading ? 
+                    null : () async {
+                      if(isLoggedIn){
+                        await context.read<AuthProvider>().signOut();
+                        if (context.mounted){
+                          context.go('/');
+                        } 
+                      } else {
+                          context.go('/auth');
+                        }
+                    },
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
@@ -65,8 +82,9 @@ class CustomNavBar extends StatelessWidget implements PreferredSizeWidget {
                           width: 1,
                         ),
                       ),
-                      child: const Text(
-                        'Sign up',
+                      child: Text(
+                        isLoggedIn ? 
+                        'Sign out' :'Sign up',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
