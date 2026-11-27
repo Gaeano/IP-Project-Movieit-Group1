@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:movieit/models/movie_details_model.dart';
@@ -6,12 +7,11 @@ import 'package:movieit/models/movie_models.dart';
 import 'package:movieit/models/sources_model.dart';
 
 
-
-
 class ApiClient {
-  
-  static const String _baseUrl = 'http://localhost:20210/api/movies';
-  static const String _baseUrlWatchmode = 'http://localhost:20210/api/watchmode';
+  static const String _host = kReleaseMode ? 'https://movieit.dcism.org' : 'http://localhost:3000';
+
+  static const String _baseUrl = '$_host/api/movies';
+  static const String _baseUrlWatchmode = '$_host/api/watchmode';
 
 
     var logger = Logger ();
