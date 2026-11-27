@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:movieit/widgets/email_confirmation_modal.dart';
 import 'package:provider/provider.dart';
 import 'package:movieit/providers/auth_provider.dart';
 
@@ -44,12 +45,16 @@ class _SignupFormState extends State<SignupForm> {
     if (result == SignUpResult.authenticated) {
       context.go('/planner');
     } else if (result == SignUpResult.needsEmailConfirmation) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created! Check your email to confirm before logging in.'),
+      await showDialog(
+        context: context,
+        builder: (context) => EmailConfirmationModal(
+          email: _emailController.text,
+          onBackToLogin: () {
+            Navigator.of(context).pop();
+            widget.onToggle();
+          },
         ),
       );
-      widget.onToggle();
     }
   }
 

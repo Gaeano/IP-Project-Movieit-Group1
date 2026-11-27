@@ -18,6 +18,7 @@ class AuthService {
       email: email.trim(),
       password: password,
       data: {'full_name': fullName.trim()},
+      emailRedirectTo: kIsWeb ? Uri.base.origin : null,
     );  
   }
 
@@ -40,6 +41,14 @@ class AuthService {
 
   Future<void> resetPassword(String email) async {
     await _client.auth.resetPasswordForEmail(email.trim());
+  }
+
+  Future<void> resendConfirmationEmail(String email) async {
+    await _client.auth.resend(
+      type: OtpType.signup,
+      email: email.trim(),
+      emailRedirectTo: kIsWeb ? Uri.base.origin : null,
+    );
   }
 
   Future<void> signOut() async {

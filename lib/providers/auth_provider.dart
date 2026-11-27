@@ -7,21 +7,22 @@ class AuthProvider extends ChangeNotifier {
   final AuthService _authService;
   late final StreamSubscription<AuthState> _authSubscription;
 
-  User? _user;
+  Session? _session;
   bool _isLoading = false;
   String? _errorMessage;
 
   AuthProvider({AuthService? authService})
       : _authService = authService ?? AuthService() {
-    _user = _authService.currentUser;
+      _session = _authService.currentSession;
     _authSubscription = _authService.onAuthStateChange.listen((data) {
-      _user = data.session?.user;
+      _session = data.session;
       notifyListeners();
     });
   }
 
-  User? get user => _user;
-  bool get isAuthenticated => _user != null;
+  Session? get session => _session;
+  User? get user => _session?.user;
+  bool get isAuthenticated => _session != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get accessToken => _authService.accessToken;
@@ -37,7 +38,7 @@ class AuthProvider extends ChangeNotifier {
         email: email,
         password: password,
       );
-      _user = response.user;
+      _session = response.session;
       return response.session != null;
     } on AuthException catch (e) {
       _errorMessage = e.message;
@@ -63,10 +64,15 @@ class AuthProvider extends ChangeNotifier {
         password: password,
         fullName: fullName,
       );
-      _user = response.user;
+      _session = response.session;
       if (response.session != null) {
         return SignUpResult.authenticated;
       }
+      if (response.user?.identities?.isEmpty ?? false){
+        _errorMessage = 'An account with this email already exists. Please log in instead.';
+        return SignUpResult.failed;
+      }
+      
       return SignUpResult.needsEmailConfirmation;
     } on AuthException catch (e) {
       _errorMessage = e.message;
@@ -98,11 +104,22 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
     try {
       await _authService.signOut();
-      _user = null;
+      _session = null;
     } on AuthException catch (e) {
       _errorMessage = e.message;
     } finally {
       _setLoading(false);
+    }
+  }
+
+  Future<String?> resendConfirmationEmail(String email) async {
+    try{
+      await _authService.resendConfirmationEmail(email);
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (_) {
+      return 'Failed to resend confirmation email. Please try again.';
     }
   }
 
